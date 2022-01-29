@@ -37,8 +37,13 @@ public final class SnapshotStage {
      * Prohibited default constructor.
      */
     private SnapshotStage() {
-        throw new AssertionError("SnapshotStage should not be instantiated");
+        throw new IllegalStateException("SnapshotStage should not be instantiated");
     }
+
+    /**
+     * Element has not been completed yet.
+     */
+    public static final String IN_DEVELOPMENT = "IN DEVELOPMENT";
 
     /**
      * Elements are highly unstable and will most likely change.
@@ -55,5 +60,5 @@ public final class SnapshotStage {
      * Elements are considered stable and unlikely to change. The element will
      * most likely be included in the next release.
      */
-    public static final String RELEASE_CANDIDATE = "RELEASE_CANDIDATE";
+    public static final String RELEASE_CANDIDATE = "RELEASE CANDIDATE";
 }

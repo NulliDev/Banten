@@ -34,7 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-//TODO: Finish, Document
+//TODO: Document
 @Snapshot
 public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
@@ -229,6 +229,7 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
         @Override
         public L orElseGetLeft(final Supplier<? extends L> supplier) {
+            Objects.requireNonNull(supplier, "The left supplier provided cannot be null");
             return this.value;
         }
 
@@ -238,7 +239,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public <X extends Throwable> L orElseThrowLeft(final Supplier<? extends X> exceptionSupplier) throws X {
+        public <X extends Throwable> L orElseThrowLeft(final Supplier<? extends X> exceptionSupplier) {
+            Objects.requireNonNull(exceptionSupplier, "The exception supplier provided cannot be null");
             return this.value;
         }
 
@@ -249,6 +251,7 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
         @Override
         public R orElseGetRight(final Supplier<? extends R> supplier) {
+            Objects.requireNonNull(supplier, "The right supplier provided cannot be null");
             return supplier.get();
         }
 
@@ -259,7 +262,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
         @Override
         public <X extends Throwable> R orElseThrowRight(final Supplier<? extends X> exceptionSupplier) throws X {
-            throw exceptionSupplier.get();
+            Objects.requireNonNull(exceptionSupplier, "The exception supplier provided cannot be null");
+            throw Objects.requireNonNull(exceptionSupplier.get(), "The thrown exception provided cannot be null");
         }
 
         @Override
@@ -414,6 +418,7 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
         @Override
         public L orElseGetLeft(final Supplier<? extends L> supplier) {
+            Objects.requireNonNull(supplier, "The left supplier provided cannot be null");
             return supplier.get();
         }
 
@@ -424,7 +429,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
         @Override
         public <X extends Throwable> L orElseThrowLeft(final Supplier<? extends X> exceptionSupplier) throws X {
-            throw exceptionSupplier.get();
+            Objects.requireNonNull(exceptionSupplier, "The exception supplier provided cannot be null");
+            throw Objects.requireNonNull(exceptionSupplier.get(), "The thrown exception provided cannot be null");
         }
 
         @Override
@@ -434,6 +440,7 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
         @Override
         public R orElseGetRight(final Supplier<? extends R> supplier) {
+            Objects.requireNonNull(supplier, "The right supplier provided cannot be null");
             return this.value;
         }
 
@@ -443,7 +450,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public <X extends Throwable> R orElseThrowRight(final Supplier<? extends X> exceptionSupplier) throws X {
+        public <X extends Throwable> R orElseThrowRight(final Supplier<? extends X> exceptionSupplier) {
+            Objects.requireNonNull(exceptionSupplier, "The exception supplier provided cannot be null");
             return this.value;
         }
 
