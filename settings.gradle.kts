@@ -14,10 +14,12 @@ pluginManagement {
 
 internal val projectNames: Map<String, List<String>> = mapOf(
     (extra["annotation.id"] as String) to listOf(
+        extra["annotation.all.id"] as String,
         extra["annotation.core.id"] as String,
         extra["annotation.processor.id"] as String
     ),
     (extra["structure.id"] as String) to listOf(
+        extra["structure.all.id"] as String,
         extra["structure.either.id"] as String
     )
 )

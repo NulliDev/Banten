@@ -8,7 +8,7 @@ plugins {
 base.archivesName.set("${extra["base.id"]}-${extra["structure.id"]}-${extra["structure.either.id"]}")
 version = extra["structure.either.version"] as String
 
-// Add annotations
+// Add dependencies
 evaluationDependsOn(":annotation:core")
 evaluationDependsOn(":annotation:processor")
 dependencies {
