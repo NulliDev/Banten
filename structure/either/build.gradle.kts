@@ -12,6 +12,9 @@ version = extra["structure.either.version"] as String
 evaluationDependsOn(":annotation:core")
 evaluationDependsOn(":annotation:processor")
 dependencies {
-    implementation(project(":annotation:core"))
+    compileOnly(project(":annotation:core"))
     annotationProcessor(project(":annotation:processor"))
+
+    testCompileOnly(project(":annotation:core"))
+    testAnnotationProcessor(project(":annotation:processor"))
 }

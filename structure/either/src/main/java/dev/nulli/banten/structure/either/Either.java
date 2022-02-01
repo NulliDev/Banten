@@ -24,8 +24,6 @@
 
 package dev.nulli.banten.structure.either;
 
-import dev.nulli.banten.annotation.core.Snapshot;
-
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,70 +32,396 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-//TODO: Document
-@Snapshot
+/**
+ * A container object which can hold one of the two types defined. If one value
+ * type is present, then the other value type will not be. If the left value
+ * type is present, {@link #hasLeft()} returns {@code true}. If the right value
+ * is present, {@link #hasRight()} returns {@code true}.
+ *
+ * <p>Additional methods that depend on the presence or absence left or right
+ * value are provided, such as {@link #orElseLeft(Object)} or {@link #orElseRight(Object)},
+ * which return a default value if the associated value type is not present, and
+ * {@link #ifLeft(Consumer)} or {@link #ifRight(Consumer)}, which performs an
+ * action if the associated value type is present.
+ *
+ * @apiNote
+ * {@code Either} is primarily intended for use when a value can be represented
+ * or used as multiple types. A value represented should never itself be
+ * {@code null}.
+ *
+ * @param <L> the type of the left value
+ * @param <R> the type of the right value
+ *
+ * @since 1.0.0
+ * @author Aaron Haim
+ */
 public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
 
+    /**
+     * Returns an {@code Either} with the non-{@code null} left value present.
+     *
+     * @param value the left value, which must be non-{@code null}
+     * @param <L> the type of the left value
+     * @param <R> the type of the right value
+     * @return an {@code Either} with the left value present
+     * @throws NullPointerException if {@code value} is {@code null}
+     */
     public static <L, R> Either<L, R> left(final L value) {
         return new Left<>(value);
     }
 
+    /**
+     * Returns an {@code Either} with the non-{@code null} right value present.
+     *
+     * @param value the right value, which must be non-{@code null}
+     * @param <L> the type of the left value
+     * @param <R> the type of the right value
+     * @return an {@code Either} with the right value present
+     * @throws NullPointerException if {@code value} is {@code null}
+     */
     public static <L, R> Either<L, R> right(final R value) {
         return new Right<>(value);
     }
 
-    // Get wrapped values
+    /**
+     * If the left value is present, returns an {@link Optional} describing the
+     * left value, otherwise an empty {@link Optional}.
+     *
+     * @return an {@link Optional} describing the left value if present, otherwise
+     *         an empty {@link Optional}
+     */
     public abstract Optional<L> left();
+
+    /**
+     * If the right value is present, returns an {@link Optional} describing the
+     * right value, otherwise an empty {@link Optional}.
+     *
+     * @return an {@link Optional} describing the right value if present, otherwise
+     *         an empty {@link Optional}
+     */
     public abstract Optional<R> right();
 
-    // Get raw values, Can be null
+    /**
+     * If the left value is present, returns the value, otherwise {@code null}.
+     *
+     * @return the left value if present, otherwise {@code null}
+     */
     public abstract L leftRaw();
+
+    /**
+     * If the right value is present, returns the value, otherwise {@code null}.
+     *
+     * @return the right value if present, otherwise {@code null}
+     */
     public abstract R rightRaw();
 
-    // Check if values exist
+    /**
+     * If the left value is present, returns {@code true}, otherwise {@code false}.
+     *
+     * @return {@code true} if the left value is present, otherwise {@code false}
+     */
     public abstract boolean hasLeft();
+
+    /**
+     * If the right value is present, returns {@code true}, otherwise {@code false}.
+     *
+     * @return {@code true} if the right value is present, otherwise {@code false}
+     */
     public abstract boolean hasRight();
 
-    // Execute when exists
+    /**
+     * If the left value is present, performs the given action with the value,
+     * otherwise does nothing.
+     *
+     * @param action the action to be performed, if the left value is present
+     * @throws NullPointerException if the given action is {@code null}
+     */
     public abstract void ifLeft(final Consumer<? super L> action);
+
+    /**
+     * If the right value is present, performs the given action with the value,
+     * otherwise does nothing.
+     *
+     * @param action the action to be performed, if the right value is present
+     * @throws NullPointerException if the given action is {@code null}
+     */
     public abstract void ifRight(final Consumer<? super R> action);
+
+    /**
+     * Performs one of the given actions depending on which value is present.
+     *
+     * @param leftAction the action to be performed, if the left value is present
+     * @param rightAction the action to be performed, if the right value is present
+     * @throws NullPointerException if either action is {@code null}
+     */
     public abstract void ifPresent(final Consumer<? super L> leftAction, final Consumer<? super R> rightAction);
 
-    // Map values to other values
-    public abstract <V> Either<V, R> mapLeft(final Function<? super L, ? extends V> map);
-    public abstract <V> Either<L, V> mapRight(final Function<? super R, ? extends V> map);
+    /**
+     * If the left value is present, returns an {@code Either} describing the
+     * result of applying the given mapping function to the left value, otherwise
+     * returns an {@code Either} with the same right value.
+     *
+     * @param map the mapping function to apply to the left value, if present
+     * @param <V> the type of the left value returned from the mapping function
+     * @return an {@link Either} describing the result of applying a mapping
+     *         function to the left value, if present, otherwise an {@link Either}
+     *         with the same right value
+     * @throws NullPointerException if the mapping function or the result of the
+     *                              mapping function is {@code null}
+     */
+    public <V> Either<V, R> mapLeft(final Function<? super L, ? extends V> map) {
+        return mapAll(map, Function.identity());
+    }
+
+    /**
+     * If the right value is present, returns an {@code Either} describing the
+     * result of applying the given mapping function to the right value, otherwise
+     * returns an {@code Either} with the same left value.
+     *
+     * @param map the mapping function to apply to the right value, if present
+     * @param <V> the type of the right value returned from the mapping function
+     * @return an {@link Either} describing the result of applying a mapping
+     *         function to the right value, if present, otherwise an {@link Either}
+     *         with the same left value
+     * @throws NullPointerException if the mapping function or the result of the
+     *                              mapping function is {@code null}
+     */
+    public <V> Either<L, V> mapRight(final Function<? super R, ? extends V> map) {
+        return mapAll(Function.identity(), map);
+    }
+
+    /**
+     * Returns an {@link Either} describing the result of applying the given
+     * mapping function to the value that is present.
+     *
+     * @param leftMap the mapping function to apply to the left value, if present
+     * @param rightMap the mapping function to apply to the right value, if present
+     * @param <VL> the type of the left value returned from the mapping function
+     * @param <VR> the type of the right value returned from the mapping function
+     * @return an {@link Either} describing the result of applying a mapping function
+     *         to the present value
+     * @throws NullPointerException if either mapping functions or the results of
+     *                              the mapping functions are {@code null}
+     */
     public abstract <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap, final Function<? super R, ? extends VR> rightMap);
+
+    /**
+     * Returns a value describing the result of applying the given mapping function
+     * to the value that is present.
+     *
+     * @param leftMap the mapping function to apply to the left value, if present
+     * @param rightMap the mapping function to apply to the right value, if present
+     * @param <V> the type of the value returned from the mapping function
+     * @return a value from the result of applying a mapping function to the present
+     *         value
+     * @throws NullPointerException if either mapping functions are {@code null}
+     */
     public abstract <V> V mapTo(final Function<? super L, ? extends V> leftMap, final Function<? super R, ? extends V> rightMap);
 
-    // Flat Map values to other values
-    public abstract <V> Either<V, R> flatMapLeft(final Function<? super L, ? extends Either<V, R>> map);
-    public abstract <V> Either<L, V> flatMapRight(final Function<? super R, ? extends Either<L, V>> map);
+    /**
+     * If the left value is present, returns the result of applying the given
+     * {@code Either}-bearing mapping function to the left value, otherwise
+     * returns an {@code Either} with the same right value.
+     *
+     * @param map the mapping function to apply to the left value, if present
+     * @param <V> the type of the left value of the {@code Either} returned by
+     *            the mapping function
+     * @return the result of apply an {@code Either}-bearing mapping function to
+     *         the left value of this {@code Either}, if present, otherwise an
+     *         {@code Either} with the same right value
+     * @throws NullPointerException if the mapping function or the result of the
+     *                              mapping function is {@code null}
+     */
+    public <V> Either<V, R> flatMapLeft(final Function<? super L, ? extends Either<V, R>> map) {
+        return flatMapAll(map, Either::right);
+    }
+
+    /**
+     * If the right value is present, returns the result of applying the given
+     * {@code Either}-bearing mapping function to the right value, otherwise
+     * returns an {@code Either} with the same left value.
+     *
+     * @param map the mapping function to apply to the right value, if present
+     * @param <V> the type of the right value of the {@code Either} returned by
+     *            the mapping function
+     * @return the result of apply an {@code Either}-bearing mapping function to
+     *         the right value of this {@code Either}, if present, otherwise an
+     *         {@code Either} with the same left value
+     * @throws NullPointerException if the mapping function or the result of the
+     *                              mapping function is {@code null}
+     */
+    public <V> Either<L, V> flatMapRight(final Function<? super R, ? extends Either<L, V>> map) {
+        return flatMapAll(Either::left, map);
+    }
+
+    /**
+     * Returns the result of applying the given {@code Either}-bearing mapping
+     * function to the value that is present.
+     *
+     * @param leftMap the mapping function to apply to the left value, if present
+     * @param rightMap the mapping function to apply to the right value, if present
+     * @param <VL> the type of the left value of the {@code Either} returned by the
+     *             mapping function
+     * @param <VR> the type of the right value of the {@code Either} returned by the
+     *             mapping function
+     * @return the result of applying an {@code Either}-bearing mapping function to
+     *         the present value
+     * @throws NullPointerException if either mapping functions or the results of
+     *                              the mapping function are {@code null}
+     *
+     */
     public abstract <VL, VR> Either<VL, VR> flatMapAll(final Function<? super L, ? extends Either<VL, VR>> leftMap, final Function<? super R, ? extends Either<VL, VR>> rightMap);
 
-    // Swap left and right values
+    /**
+     * Swaps the types of the {@code Either} such that the left value becomes the
+     * right value or vice versa if present.
+     *
+     * @return an {@code Either} where the left value becomes the right value or
+     *         vice versa, if present
+     */
     public abstract Either<R, L> swap();
 
-    // Stream left and right values
+    /**
+     * If the left value is present, a {@link Stream} is returned containing
+     * only the left value, otherwise an empty {@link Stream} is returned.
+     *
+     * @return the left {@code Either} value as a {@link Stream}
+     */
     public abstract Stream<L> streamLeft();
+
+    /**
+     * If the right value is present, a {@link Stream} is returned containing
+     * only the right value, otherwise an empty {@link Stream} is returned.
+     *
+     * @return the right {@code Either} value as a {@link Stream}
+     */
     public abstract Stream<R> streamRight();
 
-    // Set value if not present
+    /**
+     * If the left value is present, returns this {@code Either}, otherwise
+     * returns an {@code Either} with the supplied left value.
+     *
+     * @param supplier the supplying function that produces the left value
+     * @return this {@code Either}, if the left value is present, otherwise an
+     *         {@code Either} with the supplied left value
+     * @throws NullPointerException if the supplier or the left value of the
+     *                              supplier is {@code null}
+     */
     public abstract Either<L, R> orLeft(final Supplier<? extends L> supplier);
+
+    /**
+     * If the right value is present, returns this {@code Either}, otherwise
+     * returns an {@code Either} with the supplied right value.
+     *
+     * @param supplier the supplying function that produces the right value
+     * @return this {@code Either}, if the right value is present, otherwise an
+     *         {@code Either} with the supplied right value
+     * @throws NullPointerException if the supplier or the right value of the
+     *                              supplier is {@code null}
+     */
     public abstract Either<L, R> orRight(final Supplier<? extends R> supplier);
 
-    // Get alternative if not present
+    /**
+     * If the left value is present, returns the value, otherwise returns
+     * {@code other}.
+     *
+     * @param other the value to be returned, if no left value is present
+     * @return the left value, if present, otherwise {@code other}
+     */
     public abstract L orElseLeft(final L other);
+
+    /**
+     * If the left value is present, returns the value, otherwise returns the
+     * result produced by the supplying function.
+     *
+     * @param supplier the supplying function that produces a value to be returned
+     * @return the left value, if present, otherwise the result produced by the
+     *         supplying function
+     * @throws NullPointerException if the supplying function is {@code null}
+     */
     public abstract L orElseGetLeft(final Supplier<? extends L> supplier);
+
+    /**
+     * If the left value is present, returns the value, otherwise throws
+     * {@link NoSuchElementException}.
+     *
+     * @return the non-{@code null} left value described by this {@code Either}
+     * @throws NoSuchElementException if no left value is present
+     */
     public abstract L orElseThrowLeft();
+
+    /**
+     * If the left value is present, returns the value, otherwise throws an
+     * exception produced by the exception supplying function.
+     *
+     * @param exceptionSupplier the supplying function that produces an exception
+     *                          to be thrown
+     * @param <X> the type of the exception to be thrown
+     * @return the left value, if present
+     * @throws X if no left value is present
+     * @throws NullPointerException if the supplying function or the exception
+     *                              from the supplier is {@code null}
+     */
     public abstract <X extends Throwable> L orElseThrowLeft(final Supplier<? extends X> exceptionSupplier) throws X;
+
+    /**
+     * If the right value is present, returns the value, otherwise returns
+     * {@code other}.
+     *
+     * @param other the value to be returned, if no right value is present
+     * @return the right value, if present, otherwise {@code other}
+     */
     public abstract R orElseRight(final R other);
+
+    /**
+     * If the right value is present, returns the value, otherwise returns the
+     * result produced by the supplying function.
+     *
+     * @param supplier the supplying function that produces a value to be returned
+     * @return the right value, if present, otherwise the result produced by the
+     *         supplying function
+     * @throws NullPointerException if the supplying function is {@code null}
+     */
     public abstract R orElseGetRight(final Supplier<? extends R> supplier);
+
+    /**
+     * If the right value is present, returns the value, otherwise throws
+     * {@link NoSuchElementException}.
+     *
+     * @return the non-{@code null} right value described by this {@code Either}
+     * @throws NoSuchElementException if no right value is present
+     */
     public abstract R orElseThrowRight();
+
+    /**
+     * If the right value is present, returns the value, otherwise throws an
+     * exception produced by the exception supplying function.
+     *
+     * @param exceptionSupplier the supplying function that produces an exception
+     *                          to be thrown
+     * @param <X> the type of the exception to be thrown
+     * @return the right value, if present
+     * @throws X if no left value is present
+     * @throws NullPointerException if the supplying function or the exception
+     *                              from the supplier is {@code null}
+     */
     public abstract <X extends Throwable> R orElseThrowRight(final Supplier<? extends X> exceptionSupplier) throws X;
 
+    /**
+     * A container object which can hold the left type.
+     *
+     * @param <L> the type of the left value
+     * @param <R> the type of the right value
+     */
     protected static final class Left<L, R> extends Either<L, R> {
         private final L value;
 
+        /**
+         * Default constructor.
+         *
+         * @param value the left value to describe, which must be non-{@code null}
+         * @throws NullPointerException if {@code value} is {@code null}
+         */
         private Left(final L value) {
             this.value = Objects.requireNonNull(value, "The value supplied on the left must not be null");
         }
@@ -151,18 +475,6 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public <V> Either<V, R> mapLeft(final Function<? super L, ? extends V> map) {
-            Objects.requireNonNull(map, "The left map provided cannot be null");
-            return Either.left(map.apply(this.value));
-        }
-
-        @Override
-        public <V> Either<L, V> mapRight(final Function<? super R, ? extends V> map) {
-            Objects.requireNonNull(map, "The right map provided cannot be null");
-            return Either.left(this.value);
-        }
-
-        @Override
         public <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap, final Function<? super R, ? extends VR> rightMap) {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
@@ -174,18 +486,6 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
             return leftMap.apply(this.value);
-        }
-
-        @Override
-        public <V> Either<V, R> flatMapLeft(final Function<? super L, ? extends Either<V, R>> map) {
-            Objects.requireNonNull(map, "The left flat map provided cannot be null");
-            return Objects.requireNonNull(map.apply(this.value), "The returned either cannot be null");
-        }
-
-        @Override
-        public <V> Either<L, V> flatMapRight(Function<? super R, ? extends Either<L, V>> map) {
-            Objects.requireNonNull(map, "The right flat map provided cannot be null");
-            return Either.left(this.value);
         }
 
         @Override
@@ -284,9 +584,21 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
     }
 
+    /**
+     * A container object which can hold the right type.
+     *
+     * @param <L> the type of the left value
+     * @param <R> the type of the right value
+     */
     protected static final class Right<L, R> extends Either<L, R> {
         private final R value;
 
+        /**
+         * Default constructor.
+         *
+         * @param value the right value to describe, which must be non-{@code null}
+         * @throws NullPointerException if {@code value} is {@code null}
+         */
         private Right(final R value) {
             this.value = Objects.requireNonNull(value, "The value supplied on the right must not be null");
         }
@@ -340,18 +652,6 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public <V> Either<V, R> mapLeft(final Function<? super L, ? extends V> map) {
-            Objects.requireNonNull(map, "The left map provided cannot be null");
-            return Either.right(this.value);
-        }
-
-        @Override
-        public <V> Either<L, V> mapRight(final Function<? super R, ? extends V> map) {
-            Objects.requireNonNull(map, "The right map provided cannot be null");
-            return Either.right(map.apply(this.value));
-        }
-
-        @Override
         public <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap, final Function<? super R, ? extends VR> rightMap) {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
@@ -363,18 +663,6 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
             return rightMap.apply(this.value);
-        }
-
-        @Override
-        public <V> Either<V, R> flatMapLeft(final Function<? super L, ? extends Either<V, R>> map) {
-            Objects.requireNonNull(map, "The left flat map provided cannot be null");
-            return Either.right(this.value);
-        }
-
-        @Override
-        public <V> Either<L, V> flatMapRight(Function<? super R, ? extends Either<L, V>> map) {
-            Objects.requireNonNull(map, "The right flat map provided cannot be null");
-            return Objects.requireNonNull(map.apply(this.value), "The returned either cannot be null");
         }
 
         @Override
