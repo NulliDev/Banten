@@ -1,9 +1,13 @@
 import java.util.Calendar
 import org.cadixdev.gradle.licenser.Licenser
+import groovy.lang.Tuple3
+import groovy.lang.Tuple4
 
 // Add plugins
 plugins {
     java
+    `maven-publish`
+    signing
     id("org.cadixdev.licenser")
 }
 
@@ -16,7 +20,47 @@ internal val startYear: String = extra["base.year.start"] as String
 internal val currentYear: Int = Calendar.getInstance().get(Calendar.YEAR)
 internal val author: String = extra["base.author"] as String
 
-allprojects {
+// Setup Pom Properties
+internal val projectName: String = extra["base.name"] as String
+internal val projectDescription: String = extra["base.description"] as String
+
+internal val website: String = extra["base.website"] as String
+internal val rawRepo: String = extra["base.repository"] as String
+internal val urlRepo: String = "https://${rawRepo}"
+internal val scmUrlRepo: String = "${urlRepo}.git"
+internal val scmConRepo: String = "scm:git:${scmUrlRepo}"
+internal val scmDevConRepo: String = "scm:git:${scmUrlRepo}"
+
+internal val issueSystem: String = "GitHub Issues"
+internal val issueSite: String = "${urlRepo}/issues"
+
+internal val licenseName: String = extra["base.license.name"] as String
+internal val licenseUrl: String = extra["base.license.url"] as String
+
+// Setup Developers and Contributors
+internal val developersSimple: List<Tuple4<String, String, String, String>> = listOf(
+    Tuple4("ahaim5357", "Aaron Haim", "ahaim@nulli.dev", "https://ahaim.nulli.dev/")
+)
+internal val contributorsSimple: List<Tuple3<String, String, String>> = listOf()
+
+internal val developers: List<Action<MavenPomDeveloper>> = developersSimple.map {
+    Action<MavenPomDeveloper> {
+        id.set(it.v1)
+        name.set(it.v2)
+        email.set(it.v3)
+        url.set(it.v4)
+    }
+} + listOf()
+
+internal val contributors: List<Action<MavenPomContributor>> = contributorsSimple.map {
+    Action<MavenPomContributor> {
+        name.set(it.v1)
+        email.set(it.v2)
+        url.set(it.v3)
+    }
+}  + listOf()
+
+subprojects {
     // Java Settings
     plugins.withType<JavaPlugin> {
         group = artifactGroup
@@ -30,7 +74,15 @@ allprojects {
             options.encoding = fileEncoding
         }
         tasks.javadoc {
-            options.encoding = fileEncoding
+            options {
+                encoding = fileEncoding
+                if (this is StandardJavadocDocletOptions)
+                    tags(
+                        "apiNote:a:API Note:",
+                        "implSpec:a:Implementation Requirements:",
+                        "implNote:a:Implementation Note:"
+                    )
+            }
         }
 
         // Unit Tests
@@ -47,6 +99,68 @@ allprojects {
                 "version" to jUnitVersion
             )))
             testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
+        }
+
+        // Maven Publish Settings
+        plugins.withType<MavenPublishPlugin> {
+            publishing {
+
+                // Set all publishing settings
+                publications.withType<MavenPublication>().all {
+                    afterEvaluate {
+                        artifactId = base.archivesName.get()
+                    }
+
+                    pom {
+                        name.set(projectName)
+                        description.set(projectDescription)
+                        url.set(website)
+                        inceptionYear.set(startYear)
+
+                        licenses {
+                            license {
+                                name.set(licenseName)
+                                url.set(licenseUrl)
+                            }
+                        }
+
+                        developers {
+                            developers.forEach(this::developer)
+                        }
+
+                        contributors {
+                            contributors.forEach(this::contributor)
+                        }
+
+                        scm {
+                            url.set(scmUrlRepo)
+                            connection.set(scmConRepo)
+                            developerConnection.set(scmDevConRepo)
+                        }
+
+                        issueManagement {
+                            system.set(issueSystem)
+                            url.set(issueSite)
+                        }
+                    }
+                }
+
+                // Create artifacts
+                afterEvaluate {
+                    publications.create(base.archivesName.get(), MavenPublication::class.java) {
+                        from(components["java"])
+                    }
+                }
+            }
+
+            // Signing Settings
+            afterEvaluate {
+                if (extra.has("signing.secretKeyRingFile")) {
+                    plugins.withType<SigningPlugin> {
+                        signing.sign(*publishing.publications.withType<MavenPublication>().toTypedArray())
+                    }
+                }
+            }
         }
     }
 

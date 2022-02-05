@@ -22,6 +22,9 @@
  * SOFTWARE.
  */
 
+/**
+ * Exports modules for banten-annotation-processor.
+ */
 module banten.annotation.processor.main {
     requires banten.annotation.core.main;
     requires java.compiler;

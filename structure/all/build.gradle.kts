@@ -1,6 +1,8 @@
 // Add plugins
 plugins {
     `java-library`
+    `maven-publish`
+    signing
     id("org.cadixdev.licenser")
 }
 

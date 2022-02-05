@@ -22,6 +22,9 @@
  * SOFTWARE.
  */
 
+/**
+ * Exports modules for banten-structure-either.
+ */
 module banten.structure.either.main {
     requires static banten.annotation.core.main;
     exports dev.nulli.banten.structure.either;
