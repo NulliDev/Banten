@@ -136,7 +136,9 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      * @param action the action to be performed, if the left value is present
      * @throws NullPointerException if the given action is {@code null}
      */
-    public abstract void ifLeft(final Consumer<? super L> action);
+    public void ifLeft(final Consumer<? super L> action) {
+        this.ifPresent(action, $ -> {});
+    }
 
     /**
      * If the right value is present, performs the given action with the value,
@@ -145,7 +147,9 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      * @param action the action to be performed, if the right value is present
      * @throws NullPointerException if the given action is {@code null}
      */
-    public abstract void ifRight(final Consumer<? super R> action);
+    public void ifRight(final Consumer<? super R> action) {
+        this.ifPresent($ -> {}, action);
+    }
 
     /**
      * Performs one of the given actions depending on which value is present.
@@ -154,7 +158,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      * @param rightAction the action to be performed, if the right value is present
      * @throws NullPointerException if either action is {@code null}
      */
-    public abstract void ifPresent(final Consumer<? super L> leftAction, final Consumer<? super R> rightAction);
+    public abstract void ifPresent(final Consumer<? super L> leftAction,
+                                   final Consumer<? super R> rightAction);
 
     /**
      * If the left value is present, returns an {@code Either} describing the
@@ -203,7 +208,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      * @throws NullPointerException if either mapping functions or the results of
      *                              the mapping functions are {@code null}
      */
-    public abstract <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap, final Function<? super R, ? extends VR> rightMap);
+    public abstract <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap,
+                                                   final Function<? super R, ? extends VR> rightMap);
 
     /**
      * Returns a value describing the result of applying the given mapping function
@@ -216,7 +222,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      *         value
      * @throws NullPointerException if either mapping functions are {@code null}
      */
-    public abstract <V> V mapTo(final Function<? super L, ? extends V> leftMap, final Function<? super R, ? extends V> rightMap);
+    public abstract <V> V mapTo(final Function<? super L, ? extends V> leftMap,
+                                final Function<? super R, ? extends V> rightMap);
 
     /**
      * If the left value is present, returns the result of applying the given
@@ -232,7 +239,7 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      * @throws NullPointerException if the mapping function or the result of the
      *                              mapping function is {@code null}
      */
-    public <V> Either<V, R> flatMapLeft(final Function<? super L, ? extends Either<V, R>> map) {
+    public <V> Either<V, R> flatMapLeft(final Function<? super L, ? extends Either<? extends V, ? extends R>> map) {
         return flatMapAll(map, Either::right);
     }
 
@@ -250,7 +257,7 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      * @throws NullPointerException if the mapping function or the result of the
      *                              mapping function is {@code null}
      */
-    public <V> Either<L, V> flatMapRight(final Function<? super R, ? extends Either<L, V>> map) {
+    public <V> Either<L, V> flatMapRight(final Function<? super R, ? extends Either<? extends L, ? extends V>> map) {
         return flatMapAll(Either::left, map);
     }
 
@@ -270,7 +277,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      *                              the mapping function are {@code null}
      *
      */
-    public abstract <VL, VR> Either<VL, VR> flatMapAll(final Function<? super L, ? extends Either<VL, VR>> leftMap, final Function<? super R, ? extends Either<VL, VR>> rightMap);
+    public abstract <VL, VR> Either<VL, VR> flatMapAll(final Function<? super L, ? extends Either<? extends VL, ? extends VR>> leftMap,
+                                                       final Function<? super R, ? extends Either<? extends VL, ? extends VR>> rightMap);
 
     /**
      * Swaps the types of the {@code Either} such that the left value becomes the
@@ -457,42 +465,38 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public void ifLeft(final Consumer<? super L> action) {
-            Objects.requireNonNull(action, "The left action provided cannot be null");
-            action.accept(this.value);
-        }
-
-        @Override
-        public void ifRight(final Consumer<? super R> action) {
-            Objects.requireNonNull(action, "The right action provided cannot be null");
-        }
-
-        @Override
-        public void ifPresent(final Consumer<? super L> leftAction, final Consumer<? super R> rightAction) {
+        public void ifPresent(final Consumer<? super L> leftAction,
+                              final Consumer<? super R> rightAction) {
             Objects.requireNonNull(leftAction, "The left action provided cannot be null");
             Objects.requireNonNull(rightAction, "The right action provided cannot be null");
-            this.ifLeft(leftAction);
+            leftAction.accept(this.value);
         }
 
         @Override
-        public <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap, final Function<? super R, ? extends VR> rightMap) {
+        public <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap,
+                                              final Function<? super R, ? extends VR> rightMap) {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
             return Either.left(leftMap.apply(this.value));
         }
 
         @Override
-        public <V> V mapTo(final Function<? super L, ? extends V> leftMap, final Function<? super R, ? extends V> rightMap) {
+        public <V> V mapTo(final Function<? super L, ? extends V> leftMap,
+                           final Function<? super R, ? extends V> rightMap) {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
             return leftMap.apply(this.value);
         }
 
         @Override
-        public <VL, VR> Either<VL, VR> flatMapAll(Function<? super L, ? extends Either<VL, VR>> leftMap, Function<? super R, ? extends Either<VL, VR>> rightMap) {
+        public <VL, VR> Either<VL, VR> flatMapAll(final Function<? super L, ? extends Either<? extends VL, ? extends VR>> leftMap,
+                                                  final Function<? super R, ? extends Either<? extends VL, ? extends VR>> rightMap) {
             Objects.requireNonNull(leftMap, "The left flat map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right flat map provided cannot be null");
-            return Objects.requireNonNull(leftMap.apply(this.value), "The returned either cannot be null");
+
+            @SuppressWarnings("unchecked")
+            final Either<VL, VR> res = (Either<VL, VR>) leftMap.apply(this.value);
+            return Objects.requireNonNull(res, "The returned either cannot be null");
         }
 
         @Override
@@ -567,9 +571,9 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) return true;
-            return o instanceof Left<? , ?> left
+            return o instanceof Left<?, ?> left
                     && Objects.equals(this.value, left.value);
         }
 
@@ -634,42 +638,37 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public void ifLeft(final Consumer<? super L> action) {
-            Objects.requireNonNull(action, "The left action provided cannot be null");
-        }
-
-        @Override
-        public void ifRight(final Consumer<? super R> action) {
-            Objects.requireNonNull(action, "The right action provided cannot be null");
-            action.accept(this.value);
-        }
-
-        @Override
-        public void ifPresent(final Consumer<? super L> leftAction, final Consumer<? super R> rightAction) {
+        public void ifPresent(final Consumer<? super L> leftAction,
+                              final Consumer<? super R> rightAction) {
             Objects.requireNonNull(leftAction, "The left action provided cannot be null");
-            Objects.requireNonNull(rightAction, "The right action provided cannot be null");
-            this.ifRight(rightAction);
+            Objects.requireNonNull(leftAction, "The left action provided cannot be null");
+            rightAction.accept(this.value);
         }
 
         @Override
-        public <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap, final Function<? super R, ? extends VR> rightMap) {
+        public <VL, VR> Either<VL, VR> mapAll(final Function<? super L, ? extends VL> leftMap,
+                                              final Function<? super R, ? extends VR> rightMap) {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
             return Either.right(rightMap.apply(this.value));
         }
 
         @Override
-        public <V> V mapTo(final Function<? super L, ? extends V> leftMap, final Function<? super R, ? extends V> rightMap) {
+        public <V> V mapTo(final Function<? super L, ? extends V> leftMap,
+                           final Function<? super R, ? extends V> rightMap) {
             Objects.requireNonNull(leftMap, "The left map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right map provided cannot be null");
             return rightMap.apply(this.value);
         }
 
         @Override
-        public <VL, VR> Either<VL, VR> flatMapAll(Function<? super L, ? extends Either<VL, VR>> leftMap, Function<? super R, ? extends Either<VL, VR>> rightMap) {
+        public <VL, VR> Either<VL, VR> flatMapAll(final Function<? super L, ? extends Either<? extends VL, ? extends VR>> leftMap,
+                                                  final Function<? super R, ? extends Either<? extends VL, ? extends VR>> rightMap) {
             Objects.requireNonNull(leftMap, "The left flat map provided cannot be null");
             Objects.requireNonNull(rightMap, "The right flat map provided cannot be null");
-            return Objects.requireNonNull(rightMap.apply(this.value), "The returned either cannot be null");
+            @SuppressWarnings("unchecked")
+            final Either<VL, VR> res = (Either<VL, VR>) rightMap.apply(this.value);
+            return Objects.requireNonNull(res, "The returned either cannot be null");
         }
 
         @Override
@@ -744,9 +743,9 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) return true;
-            return o instanceof Right<? , ?> right
+            return o instanceof Right<?, ?> right
                     && Objects.equals(this.value, right.value);
         }
 
