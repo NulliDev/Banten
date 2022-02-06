@@ -2,6 +2,8 @@ import java.util.Calendar
 import org.cadixdev.gradle.licenser.Licenser
 import groovy.lang.Tuple3
 import groovy.lang.Tuple4
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 // Add plugins
 plugins {
@@ -82,6 +84,21 @@ subprojects {
                         "implSpec:a:Implementation Requirements:",
                         "implNote:a:Implementation Note:"
                     )
+            }
+        }
+
+        // Manifest Attributes
+        afterEvaluate {
+            tasks.jar {
+                manifest.attributes(mapOf(
+                    "Specification-Title" to projectName,
+                    "Specification-Vendor" to author,
+                    "Specification-Version" to (project.version as String).split('-')[0],
+                    "Implementation-Title" to base.archivesName.get(),
+                    "Implementation-Vendor" to author,
+                    "Implementation-Version" to project.version,
+                    "Implementation-Timestamp" to DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                ))
             }
         }
 
