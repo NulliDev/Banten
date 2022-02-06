@@ -22,43 +22,8 @@
  * SOFTWARE.
  */
 
-package dev.nulli.banten.annotation.core;
-
 /**
- * The constants of this class provide some lifecycles an element annotated with
- * {@link Snapshot} can possess.
- *
- * @since 1.0.0
- * @author Aaron Haim
+ * These annotations are meant to be used during testing of an element to mark
+ * its purpose or usage.
  */
-public final class SnapshotStage {
-
-    /**
-     * Prohibited default constructor.
-     */
-    private SnapshotStage() {
-        throw new IllegalStateException("SnapshotStage should not be instantiated");
-    }
-
-    /**
-     * Element has not been completed yet.
-     */
-    public static final String IN_DEVELOPMENT = "IN DEVELOPMENT";
-
-    /**
-     * Elements are highly unstable and will most likely change.
-     */
-    public static final String ALPHA = "ALPHA";
-
-    /**
-     * Elements are in a stable enough state to be used; however they may
-     * still be changed.
-     */
-    public static final String BETA = "BETA";
-
-    /**
-     * Elements are considered stable and unlikely to change. The element will
-     * most likely be included in the next release.
-     */
-    public static final String RELEASE_CANDIDATE = "RELEASE CANDIDATE";
-}
+package dev.nulli.banten.annotation.core.test;

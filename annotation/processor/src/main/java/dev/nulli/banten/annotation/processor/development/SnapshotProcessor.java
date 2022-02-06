@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package dev.nulli.banten.annotation.processor;
+package dev.nulli.banten.annotation.processor.development;
 
-import dev.nulli.banten.annotation.core.Snapshot;
+import dev.nulli.banten.annotation.core.development.Snapshot;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -47,7 +47,7 @@ import java.util.Set;
  * @since 1.0.0
  * @author Aaron Haim
  */
-@SupportedAnnotationTypes("dev.nulli.banten.annotation.core.Snapshot")
+@SupportedAnnotationTypes("dev.nulli.banten.annotation.core.development.Snapshot")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class SnapshotProcessor extends AbstractProcessor {
 
@@ -60,7 +60,7 @@ public class SnapshotProcessor extends AbstractProcessor {
                         SuppressWarnings warnings = element.getAnnotation(SuppressWarnings.class);
                         if (warnings == null || Arrays.stream(warnings.value()).noneMatch(s -> s.equals("snapshot")))
                             this.processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING,
-                                    "'" + element.getSimpleName() + "' is a snapshot element in the '" + snapshot.value() + "' phase. This element may be changed or removed in a future release.",
+                                    "'" + element.asType() + "' is a snapshot element in the '" + snapshot.value() + "' phase. This element may be changed or removed in a future release.",
                                     element);
                     });
         }

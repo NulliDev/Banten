@@ -24,51 +24,27 @@
 
 package dev.nulli.banten.annotation.core;
 
+import dev.nulli.banten.annotation.core.development.Snapshot;
+import dev.nulli.banten.annotation.core.development.SnapshotStage;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * An accessible element (class, method, field, etc.) annotated with
- * {@code @Snapshot} may have changes that are incompatible or removed in a
- * future version.
- *
- * The lifecycle stage the element is currently part of can be specified via
- * the {@code value}. By default, this is set to {@link SnapshotStage#BETA}.
- *
- * @implNote
- * When using the annotation processor, a warning message will appear denoting
- * that the annotated element is incomplete. This message can be suppressed if
- * the element is also annotated with {@link SuppressWarnings} with the
- * {@code snapshot} value.
- *
- * @apiNote
- * Elements that are annotated with {@code @Snapshot} and will be removed or
- * moved to a different location should have a buffer beta version. The element
- * should be annotated with {@code @Deprecated} and specified in the javadoc
- * what is happening with the element.
- *
- * @since 1.0.0
- * @author Aaron Haim
- */
+@Snapshot(SnapshotStage.IN_DEVELOPMENT)
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({
-        ElementType.TYPE,
         ElementType.FIELD,
         ElementType.METHOD,
-        ElementType.CONSTRUCTOR,
-        ElementType.ANNOTATION_TYPE,
-        ElementType.PACKAGE
+        ElementType.PARAMETER,
+        ElementType.LOCAL_VARIABLE,
+        ElementType.RECORD_COMPONENT,
 })
-public @interface Snapshot {
+public @interface NonNull {
 
-    /**
-     * Returns the stage the snapshot is in.
-     *
-     * @return the stage the snapshot is in
-     */
-    String value() default SnapshotStage.BETA;
+    //TODO: May want to return no string and generate message
+    String value() default "@NonNull annotated element returned null";
 }

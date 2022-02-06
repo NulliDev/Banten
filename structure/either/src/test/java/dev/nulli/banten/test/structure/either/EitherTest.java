@@ -24,7 +24,7 @@
 
 package dev.nulli.banten.test.structure.either;
 
-import dev.nulli.banten.annotation.core.TestImplementation;
+import dev.nulli.banten.annotation.core.test.TestImplementation;
 import dev.nulli.banten.structure.either.Either;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

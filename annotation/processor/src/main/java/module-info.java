@@ -29,4 +29,5 @@ module banten.annotation.processor.main {
     requires banten.annotation.core.main;
     requires java.compiler;
     exports dev.nulli.banten.annotation.processor;
+    exports dev.nulli.banten.annotation.processor.development;
 }

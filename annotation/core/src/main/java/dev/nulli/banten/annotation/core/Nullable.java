@@ -22,11 +22,26 @@
  * SOFTWARE.
  */
 
-/**
- * Exports modules for banten-annotation-core.
- */
-module banten.annotation.core.main {
-    exports dev.nulli.banten.annotation.core;
-    exports dev.nulli.banten.annotation.core.test;
-    exports dev.nulli.banten.annotation.core.development;
+package dev.nulli.banten.annotation.core;
+
+import dev.nulli.banten.annotation.core.development.Snapshot;
+import dev.nulli.banten.annotation.core.development.SnapshotStage;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Snapshot(SnapshotStage.IN_DEVELOPMENT)
+@Documented
+@Retention(RetentionPolicy.CLASS)
+@Target({
+        ElementType.FIELD,
+        ElementType.METHOD,
+        ElementType.PARAMETER,
+        ElementType.LOCAL_VARIABLE,
+        ElementType.RECORD_COMPONENT,
+})
+public @interface Nullable {
 }

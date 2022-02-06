@@ -22,39 +22,43 @@
  * SOFTWARE.
  */
 
-package dev.nulli.banten.annotation.core;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package dev.nulli.banten.annotation.core.development;
 
 /**
- * An accessible type annotated with {@code TestImplementation} is responsible
- * for running test cases on the specified types.
- *
- * <p>If no types are specified, then the test implementation are for general
- * cases.
- *
- * @implNote
- * This annotation is only used as a marker within the source. It will be
- * discarded at compile time.
+ * The constants of this class provide some lifecycles an element annotated with
+ * {@link Snapshot} can possess.
  *
  * @since 1.0.0
  * @author Aaron Haim
  */
-@Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({
-        ElementType.TYPE
-})
-public @interface TestImplementation {
+public final class SnapshotStage {
 
     /**
-     * Returns the classes this type is testing.
-     *
-     * @return the classes being tested
+     * Prohibited default constructor.
      */
-    Class<?>[] value() default {};
+    private SnapshotStage() {
+        throw new IllegalStateException("SnapshotStage should not be instantiated");
+    }
+
+    /**
+     * Element has not been completed yet.
+     */
+    public static final String IN_DEVELOPMENT = "IN DEVELOPMENT";
+
+    /**
+     * Elements are highly unstable and will most likely change.
+     */
+    public static final String ALPHA = "ALPHA";
+
+    /**
+     * Elements are in a stable enough state to be used; however they may
+     * still be changed.
+     */
+    public static final String BETA = "BETA";
+
+    /**
+     * Elements are considered stable and unlikely to change. The element will
+     * most likely be included in the next release.
+     */
+    public static final String RELEASE_CANDIDATE = "RELEASE CANDIDATE";
 }
