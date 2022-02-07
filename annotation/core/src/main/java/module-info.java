@@ -26,7 +26,6 @@
  * Exports modules for banten-annotation-core.
  */
 module banten.annotation.core.main {
-    exports dev.nulli.banten.annotation.core;
     exports dev.nulli.banten.annotation.core.test;
     exports dev.nulli.banten.annotation.core.development;
 }
