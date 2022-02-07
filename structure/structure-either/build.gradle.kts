@@ -11,12 +11,10 @@ base.archivesName.set("${extra["base.id"]}-${extra["structure.id"]}-${extra["str
 version = extra["structure.either.version"] as String
 
 // Add dependencies
-evaluationDependsOn(":annotation:core")
-evaluationDependsOn(":annotation:processor")
 dependencies {
-    compileOnly(project(":annotation:core"))
-    annotationProcessor(project(":annotation:processor"))
+    compileOnly(project(":annotation:annotation-core"))
+    annotationProcessor(project(":annotation:annotation-processor"))
 
-    testCompileOnly(project(":annotation:core"))
-    testAnnotationProcessor(project(":annotation:processor"))
+    testCompileOnly(project(":annotation:annotation-core"))
+    testAnnotationProcessor(project(":annotation:annotation-processor"))
 }

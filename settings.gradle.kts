@@ -14,19 +14,20 @@ pluginManagement {
 
 internal val projectNames: Map<String, List<String>> = mapOf(
     (extra["annotation.id"] as String) to listOf(
-        extra["annotation.all.id"] as String,
         extra["annotation.core.id"] as String,
-        extra["annotation.processor.id"] as String
+        extra["annotation.processor.id"] as String,
+        extra["annotation.all.id"] as String
     ),
     (extra["structure.id"] as String) to listOf(
-        extra["structure.all.id"] as String,
-        extra["structure.either.id"] as String
+        extra["structure.either.id"] as String,
+        extra["structure.all.id"] as String
     )
 )
 
 // Add Project Builds
 projectNames.forEach { (key, values) ->
     values.forEach {
-        include("${key}:${it}")
+        include("${key}:${key}-${it}")
     }
 }
+include(extra["all.id"] as String)

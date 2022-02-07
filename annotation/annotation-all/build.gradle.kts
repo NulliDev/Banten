@@ -11,9 +11,7 @@ base.archivesName.set("${extra["base.id"]}-${extra["annotation.id"]}-${extra["an
 version = extra["annotation.all.version"] as String
 
 // Add dependencies
-evaluationDependsOn(":annotation:core")
-evaluationDependsOn(":annotation:processor")
 dependencies {
-    api(project(":annotation:core"))
-    annotationProcessor(project(":annotation:processor"))
+    api(project(":annotation:annotation-core"))
+    annotationProcessor(project(":annotation:annotation-processor"))
 }

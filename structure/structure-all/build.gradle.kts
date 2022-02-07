@@ -11,7 +11,6 @@ base.archivesName.set("${extra["base.id"]}-${extra["structure.id"]}-${extra["str
 version = extra["structure.all.version"] as String
 
 // Add dependencies
-evaluationDependsOn(":structure:either")
 dependencies {
-    api(project(":structure:either"))
+    api(project(":structure:structure-either"))
 }
