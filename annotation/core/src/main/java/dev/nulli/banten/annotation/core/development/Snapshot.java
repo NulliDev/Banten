@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.nulli.banten.annotation.core;
+package dev.nulli.banten.annotation.core.development;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

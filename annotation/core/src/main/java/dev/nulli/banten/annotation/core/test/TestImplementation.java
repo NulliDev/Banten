@@ -22,11 +22,39 @@
  * SOFTWARE.
  */
 
+package dev.nulli.banten.annotation.core.test;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * Exports modules for banten-annotation-processor.
+ * An accessible type annotated with {@code TestImplementation} is responsible
+ * for running test cases on the specified types.
+ *
+ * <p>If no types are specified, then the test implementation are for general
+ * cases.
+ *
+ * @implNote
+ * This annotation is only used as a marker within the source. It will be
+ * discarded at compile time.
+ *
+ * @since 1.0.0
+ * @author Aaron Haim
  */
-module banten.annotation.processor.main {
-    requires banten.annotation.core.main;
-    requires java.compiler;
-    exports dev.nulli.banten.annotation.processor.development;
+@Documented
+@Retention(RetentionPolicy.SOURCE)
+@Target({
+        ElementType.TYPE
+})
+public @interface TestImplementation {
+
+    /**
+     * Returns the classes this type is testing.
+     *
+     * @return the classes being tested
+     */
+    Class<?>[] value() default {};
 }

@@ -23,10 +23,7 @@
  */
 
 /**
- * Exports modules for banten-annotation-processor.
+ * A processor package for {@code banten-annotation-core}. Handles all compiler-based
+ * annotations.
  */
-module banten.annotation.processor.main {
-    requires banten.annotation.core.main;
-    requires java.compiler;
-    exports dev.nulli.banten.annotation.processor.development;
-}
+package dev.nulli.banten.annotation.processor.development;
