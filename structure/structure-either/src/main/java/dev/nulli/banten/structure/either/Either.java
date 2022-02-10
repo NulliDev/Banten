@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * type is present, {@link #hasLeft()} returns {@code true}. If the right value
  * is present, {@link #hasRight()} returns {@code true}.
  *
- * <p>Additional methods that depend on the presence or absence left or right
+ * <p>Additional methods that depend on the presence or absence of the left or right
  * value are provided, such as {@link #orElseLeft(Object)} or {@link #orElseRight(Object)},
  * which return a default value if the associated value type is not present, and
  * {@link #ifLeft(Consumer)} or {@link #ifRight(Consumer)}, which performs an
@@ -168,8 +168,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      *
      * @param map the mapping function to apply to the left value, if present
      * @param <V> the type of the left value returned from the mapping function
-     * @return an {@link Either} describing the result of applying a mapping
-     *         function to the left value, if present, otherwise an {@link Either}
+     * @return an {@code Either} describing the result of applying a mapping
+     *         function to the left value, if present, otherwise an {@code Either}
      *         with the same right value
      * @throws NullPointerException if the mapping function or the result of the
      *                              mapping function is {@code null}
@@ -185,8 +185,8 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      *
      * @param map the mapping function to apply to the right value, if present
      * @param <V> the type of the right value returned from the mapping function
-     * @return an {@link Either} describing the result of applying a mapping
-     *         function to the right value, if present, otherwise an {@link Either}
+     * @return an {@code Either} describing the result of applying a mapping
+     *         function to the right value, if present, otherwise an {@code Either}
      *         with the same left value
      * @throws NullPointerException if the mapping function or the result of the
      *                              mapping function is {@code null}
@@ -196,14 +196,14 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
     }
 
     /**
-     * Returns an {@link Either} describing the result of applying the given
+     * Returns an {@code Either} describing the result of applying the given
      * mapping function to the value that is present.
      *
      * @param leftMap the mapping function to apply to the left value, if present
      * @param rightMap the mapping function to apply to the right value, if present
      * @param <VL> the type of the left value returned from the mapping function
      * @param <VR> the type of the right value returned from the mapping function
-     * @return an {@link Either} describing the result of applying a mapping function
+     * @return an {@code Either} describing the result of applying a mapping function
      *         to the present value
      * @throws NullPointerException if either mapping functions or the results of
      *                              the mapping functions are {@code null}
@@ -274,7 +274,7 @@ public abstract sealed class Either<L, R> permits Either.Left, Either.Right {
      * @return the result of applying an {@code Either}-bearing mapping function to
      *         the present value
      * @throws NullPointerException if either mapping functions or the results of
-     *                              the mapping function are {@code null}
+     *                              the mapping functions are {@code null}
      *
      */
     public abstract <VL, VR> Either<VL, VR> flatMapAll(final Function<? super L, ? extends Either<? extends VL, ? extends VR>> leftMap,
