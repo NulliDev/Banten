@@ -540,11 +540,11 @@ public abstract sealed class Either3<T1, T2, T3> permits Either3.First, Either3.
     public abstract <X extends Throwable> T2 orElseThrowSecond(final Supplier<? extends X> exceptionSupplier) throws X;
 
     /**
-     * If the second type value is present, returns the value, otherwise returns
+     * If the third type value is present, returns the value, otherwise returns
      * {@code other}.
      *
-     * @param other the value to be returned, if no second type value is present
-     * @return the second type value, if present, otherwise {@code other}
+     * @param other the value to be returned, if no third type value is present
+     * @return the third type value, if present, otherwise {@code other}
      */
     public abstract T3 orElseThird(final T3 other);
 

@@ -108,7 +108,7 @@ public final class Either3Test {
         Assertions.assertDoesNotThrow(() -> Either3.second(this.secondValue));
         Assertions.assertThrows(NullPointerException.class, () -> Either3.second(null));
 
-        // Test second values
+        // Test third values
         Assertions.assertDoesNotThrow(() -> Either3.third(this.thirdValue));
         Assertions.assertThrows(NullPointerException.class, () -> Either3.third(null));
     }
